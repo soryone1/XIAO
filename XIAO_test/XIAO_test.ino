@@ -1,8 +1,8 @@
 #include "TM1637.h"
 
 /* Button variables setup */
-const byte ledPin_Y = 0;        // Blue led is for "START"
-const byte ledPin_B = 2;        // Yellow led is for "SET"
+const byte ledPin_Y = 0;            // Blue led is for "START"
+const byte ledPin_B = 2;            // Yellow led is for "SET"
 const byte buttonPin_Y = 1;
 const byte buttonPin_B = 3;
 
@@ -90,20 +90,19 @@ void loop() {
         if (buttonState_B == LOW) {
           Serial.println("Blue");
 
-          /* Blue Button to confirm the time here */
+          /* Blue Button to confirm the time init here */
           if (startTiming == false && timeSet == false) {
             timeSet = true;
             selectTime = setTimeVal;
             countDown = selectTime;
             startTiming = true;
           }
-          /* Blue Button to confirm the time here */
+          /* Blue Button to start the timer over and over again after setup */
           if (startTiming == false && timeSet == true && countFinish == true) {
             analogWrite(ledPin_B, 0);
             selectTime = setTimeVal;
             countDown = selectTime;
             startTiming = true;
-
           }
         }
 
@@ -114,20 +113,21 @@ void loop() {
   lastButtonState_Y = reading_Y;
   lastButtonState_B = reading_B;
 
+  /* inital setup here, the yellow button light up, the blue button fade  */
   if (timeSet == false && startTiming == false) {
     digitalWrite(ledPin_Y, HIGH);
     fade(ledPin_B);
     tm1637.displayNum(setTimeVal);
   }
 
+  /*  after the init setup, turn off the yellow button forever  */
   if (timeSet == true && startTiming == true && countFinish == false) {
     digitalWrite(ledPin_Y, LOW);
     analogWrite(ledPin_B, 0);
   }
 
+  /*  when timer starts, begin to count down, when count finished, back to the counter state   */
   if (startTiming == true) {
-
-
     if (millis() - preCountTime > 1000) {
       preCountTime = millis();
 
