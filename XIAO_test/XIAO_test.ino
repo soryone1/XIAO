@@ -1,4 +1,8 @@
 #include "TM1637.h"
+#include <Grove_LED_Bar.h>
+
+/* LED bar setup */
+Grove_LED_Bar bar(10, 9, 0, LED_BAR_10); // Clock pin, Data pin, Orientation
 
 /* Button variables setup */
 const byte ledPin_Y = 0;            // Blue led is for "START"
@@ -38,10 +42,15 @@ int selectTime;
 unsigned long preCountTime = 0;
 int countDown;
 
+/* variables for led bar */
+unsigned long preFadeBarTime = 0;
+byte barLevel;
+
 void setup() {
   Serial.begin(9600);
   tm1637.init();
   tm1637.set(BRIGHTEST);                       // BRIGHT_TYPICAL = 2,BRIGHT_DARKEST = 0,BRIGHTEST = 7;
+  bar.begin();
   pinMode(ledPin_Y, OUTPUT);
   pinMode(ledPin_B, OUTPUT);
   pinMode(buttonPin_Y, INPUT);
@@ -50,10 +59,13 @@ void setup() {
   tm1637.displayStr("HEL0");
   digitalWrite(ledPin_Y, HIGH);
   digitalWrite(ledPin_B, HIGH);
+  bar.setLevel(2);
   delay(1000);
   digitalWrite(ledPin_Y, LOW);
   digitalWrite(ledPin_B, LOW);
+  bar.setLevel(5);
   delay(1000);
+  bar.setLevel(10);
 }
 
 void loop() {
@@ -96,6 +108,7 @@ void loop() {
             selectTime = setTimeVal;
             countDown = selectTime;
             startTiming = true;
+            barLevel = 10;
           }
           /* Blue Button to start the timer over and over again after setup */
           if (startTiming == false && timeSet == true && countFinish == true) {
@@ -103,6 +116,7 @@ void loop() {
             selectTime = setTimeVal;
             countDown = selectTime;
             startTiming = true;
+            barLevel = 10;
           }
         }
 
@@ -128,6 +142,7 @@ void loop() {
 
   /*  when timer starts, begin to count down, when count finished, back to the counter state   */
   if (startTiming == true) {
+    fadeBar();
     if (millis() - preCountTime > 1000) {
       preCountTime = millis();
 
@@ -140,10 +155,14 @@ void loop() {
         tm1637.clearDisplay();
         tm1637.displayNum(selectTime);
         analogWrite(ledPin_B, 255);
+        bar.setLevel(10);
       }
     }
+
+
   }
 
+  Serial.println(barLevel);
 }
 
 void fade(int led) {
@@ -154,5 +173,13 @@ void fade(int led) {
       fadeAmount = -fadeAmount;
     }
     preFadeTime = millis();
+  }
+}
+
+void fadeBar() {
+  if (millis() - preFadeBarTime >= selectTime * 100) {
+    bar.setLevel(barLevel);
+    preFadeBarTime = millis();
+    barLevel--;
   }
 }
