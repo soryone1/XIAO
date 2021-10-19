@@ -1,5 +1,13 @@
+/* DISCIPLINE 
+ *  
+ * Design and make by Jasper Wang, sponsor by Seeed.
+ * 
+ * Date: 2021.10.20
+ */
+
 #include "TM1637.h"
 #include <Grove_LED_Bar.h>
+#define SPEAKER 5
 
 /* LED bar setup */
 Grove_LED_Bar bar(10, 9, 0, LED_BAR_10); // Clock pin, Data pin, Orientation
@@ -43,13 +51,23 @@ unsigned long preCountTime = 0;
 int countDown;
 
 /* variables for led bar */
+
 unsigned long preFadeBarTime = 0;
 byte barLevel;
 
+/* variables for led bar */
+int BassTab[] = {1911, 1702, 1516, 1431, 1275, 1136, 1012};
+/*                 1     2     3     4     5     6     7            */
+
 void setup() {
   Serial.begin(9600);
+
+  pinMode(SPEAKER, OUTPUT);
+  digitalWrite(SPEAKER, LOW);
+
   tm1637.init();
   tm1637.set(BRIGHTEST);                       // BRIGHT_TYPICAL = 2,BRIGHT_DARKEST = 0,BRIGHTEST = 7;
+
   bar.begin();
   pinMode(ledPin_Y, OUTPUT);
   pinMode(ledPin_B, OUTPUT);
@@ -60,12 +78,15 @@ void setup() {
   digitalWrite(ledPin_Y, HIGH);
   digitalWrite(ledPin_B, HIGH);
   bar.setLevel(2);
+  sound(0);
   delay(1000);
   digitalWrite(ledPin_Y, LOW);
   digitalWrite(ledPin_B, LOW);
   bar.setLevel(5);
+  sound(1);
   delay(1000);
   bar.setLevel(10);
+  sound(2);
 }
 
 void loop() {
@@ -87,7 +108,9 @@ void loop() {
       if (buttonState_Y == LOW) {
         /* Yellow Button to set the timer here */
         Serial.println("Yellow");
+
         if (timeSet == false) {
+          sound(0);
           setTimeVal += 30;
           if (setTimeVal > 120) {
             setTimeVal = 30;
@@ -101,6 +124,7 @@ void loop() {
         buttonState_B = reading_B;
         if (buttonState_B == LOW) {
           Serial.println("Blue");
+          sound(4);
 
           /* Blue Button to confirm the time init here */
           if (startTiming == false && timeSet == false) {
@@ -156,13 +180,18 @@ void loop() {
         tm1637.displayNum(selectTime);
         analogWrite(ledPin_B, 255);
         bar.setLevel(10);
+        sound(5);
+        delay(200);
+        sound(5);
+        delay(200);
+        sound(5);
+        delay(200);
+        sound(5);
       }
     }
 
-
   }
 
-  Serial.println(barLevel);
 }
 
 void fade(int led) {
@@ -181,5 +210,16 @@ void fadeBar() {
     bar.setLevel(barLevel);
     preFadeBarTime = millis();
     barLevel--;
+  }
+}
+
+void sound(uint8_t note_index) {
+
+  for (int i = 0; i < 40; i++)
+  {
+    digitalWrite(SPEAKER, HIGH);
+    delayMicroseconds(BassTab[note_index]);
+    digitalWrite(SPEAKER, LOW);
+    delayMicroseconds(BassTab[note_index]);
   }
 }
