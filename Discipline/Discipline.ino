@@ -124,10 +124,11 @@ void loop() {
         buttonState_B = reading_B;
         if (buttonState_B == LOW) {
           Serial.println("Blue");
-          sound(4);
+          
 
           /* Blue Button to confirm the time init here */
           if (startTiming == false && timeSet == false) {
+            sound(4);
             timeSet = true;
             selectTime = setTimeVal;
             countDown = selectTime;
@@ -136,6 +137,7 @@ void loop() {
           }
           /* Blue Button to start the timer over and over again after setup */
           if (startTiming == false && timeSet == true && countFinish == true) {
+            sound(4);
             analogWrite(ledPin_B, 0);
             selectTime = setTimeVal;
             countDown = selectTime;
