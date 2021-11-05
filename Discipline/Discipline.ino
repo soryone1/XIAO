@@ -216,7 +216,6 @@ void fadeBar() {
 }
 
 void sound(uint8_t note_index) {
-
   for (int i = 0; i < 40; i++)
   {
     digitalWrite(SPEAKER, HIGH);
