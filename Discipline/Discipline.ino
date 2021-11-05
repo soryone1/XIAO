@@ -1,8 +1,8 @@
 /* DISCIPLINE 
  *  
- * Design and make by Jasper Wang, sponsor by Seeed.
+ * Design and make by Jasper Wang, sponsored by Seeed.
  * 
- * Date: 2021.10.20
+ * Date: 2021.11.5
  */
 
 #include "TM1637.h"
@@ -10,13 +10,13 @@
 #define SPEAKER 5
 
 /* LED bar setup */
-Grove_LED_Bar bar(10, 9, 0, LED_BAR_10); // Clock pin, Data pin, Orientation
+Grove_LED_Bar bar(9, 8, 0, LED_BAR_10); // Clock pin, Data pin, Orientation
 
 /* Button variables setup */
 const byte ledPin_Y = 0;            // Blue led is for "START"
-const byte ledPin_B = 2;            // Yellow led is for "SET"
+const byte ledPin_B = 7;            // Yellow led is for "SET"
 const byte buttonPin_Y = 1;
-const byte buttonPin_B = 3;
+const byte buttonPin_B = 6;
 
 int buttonState_Y;
 int lastButtonState_Y = LOW;
@@ -27,8 +27,8 @@ unsigned long lastDebunceTime_B = 0;
 unsigned long debounceDelay = 50;
 
 /* Screen variables setup */
-const byte CLK = 8;
-const byte DIO = 9;
+const byte CLK = 9;
+const byte DIO = 10;
 TM1637 tm1637(CLK, DIO);
 
 /* flag variables here */
@@ -60,7 +60,7 @@ int BassTab[] = {1911, 1702, 1516, 1431, 1275, 1136, 1012};
 /*                 1     2     3     4     5     6     7            */
 
 void setup() {
-  Serial.begin(9600);
+//  Serial.begin(9600);
 
   pinMode(SPEAKER, OUTPUT);
   digitalWrite(SPEAKER, LOW);
@@ -107,7 +107,7 @@ void loop() {
       buttonState_Y = reading_Y;
       if (buttonState_Y == LOW) {
         /* Yellow Button to set the timer here */
-        Serial.println("Yellow");
+//        Serial.println("Yellow");
 
         if (timeSet == false) {
           sound(0);
@@ -123,7 +123,7 @@ void loop() {
       if (reading_B != buttonState_B) {
         buttonState_B = reading_B;
         if (buttonState_B == LOW) {
-          Serial.println("Blue");
+//          Serial.println("Blue");
           
 
           /* Blue Button to confirm the time init here */
